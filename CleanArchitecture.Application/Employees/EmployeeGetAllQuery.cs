@@ -17,25 +17,21 @@ public sealed class EmployeeGetAllQueryResponse : EntityDto
 internal sealed class EmployeeGetAllQueryHandler(
     IEmployeeRepository employeeRepository) : IRequestHandler<EmployeeGetAllQuery, IQueryable<EmployeeGetAllQueryResponse>>
 {
-    public async Task<IQueryable<EmployeeGetAllQueryResponse>> Handle(EmployeeGetAllQuery request, CancellationToken cancellationToken)
+    public Task<IQueryable<EmployeeGetAllQueryResponse>> Handle(EmployeeGetAllQuery request, CancellationToken cancellationToken)
     {
-        var employees = await employeeRepository.GetAll().Select(s => new EmployeeGetAllQueryResponse
+        var employees = employeeRepository.GetAll().Select(s => new EmployeeGetAllQueryResponse
         {
             FirstName = s.FirstName,
             LastName = s.LastName,
             DateOfBirth = s.DateOfBirth,
             Salary = s.Salary,
-            TCNo = s.PersonalInformation.TCNo
-
-        })
-        return employees.Select(e => new EmployeeGetAllQueryResponse
-        {
-            Id = e.Id,
-            FirstName = e.FirstName,
-            LastName = e.LastName,
-            DateOfBirth = e.DateOfBirth,
-            Salary = e.Salary,
-            TCNo = e.PersonalInformation.TCNo
-        });
+            TCNo = s.PersonalInformation.TCNo,
+            Id = s.Id,
+            IsDeleted = s.IsDeleted,
+            CreateAt = s.CreateAt,
+            DeleteAt = s.DeleteAt,
+            UpdateAt = s.UpdateAt
+        }).AsQueryable();
+        return Task.FromResult(employees);
     }
 }
